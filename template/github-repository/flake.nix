@@ -18,6 +18,8 @@
     {
       schemas = flake-schemas.schemas;
 
+      formatter = forEachSupportedSystem ({ pkgs }: pkgs.nixpkgs-fmt);
+
       checks = forEachSupportedSystem ({ pkgs }: {
         inherit (utility-flake.checks.${pkgs.system}) pre-commit-check;
       });

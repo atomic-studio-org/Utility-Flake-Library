@@ -3,12 +3,13 @@
   description = "Utility Library for Atomic Studio projects";
 
   inputs = {
+    bluebuild.url = "https://flakehub.com/f/blue-build/cli/0.8.2.tar.gz";
     flake-schemas.url = "https://flakehub.com/f/DeterminateSystems/flake-schemas/*.tar.gz";
     nix-pre-commit-hooks.url = "https://github.com/cachix/pre-commit-hooks.nix/tarball/master";
     nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/*.tar.gz";
   };
 
-  outputs = { self, flake-schemas, nixpkgs, nix-pre-commit-hooks }:
+  outputs = { self, flake-schemas, nixpkgs, nix-pre-commit-hooks, bluebuild }:
     let
       supportedSystems = [ "x86_64-linux" "aarch64-darwin" "x86_64-darwin" "aarch64-linux" ];
       forEachSupportedSystem = f: nixpkgs.lib.genAttrs supportedSystems (system: f {
@@ -18,8 +19,21 @@
     {
       schemas = flake-schemas.schemas;
 
-      checks = forEachSupportedSystem ({ pkgs
-                                       }: {
+      formatter = forEachSupportedSystem ({ pkgs }: pkgs.nixpkgs-fmt);
+
+      lib = forEachSupportedSystem ({ pkgs }: {
+        iterFullSystemSupport = forEachSupportedSystem;
+
+        devShellPackages = with pkgs; [
+          bluebuild.packages.${pkgs.system}.bluebuild
+          git
+          jq
+          nixpkgs-fmt
+          nushell
+        ];
+      });
+
+      checks = forEachSupportedSystem ({ pkgs }: {
         pre-commit-check = nix-pre-commit-hooks.lib.${pkgs.system}.run {
           src = ./.;
 
@@ -44,22 +58,17 @@
 
       packages = forEachSupportedSystem ({ pkgs }: {
         cosign-generate = pkgs.writeScriptBin "cosign-generate" ''
-          	  echo "DO NOT add any password, this will break your CI jobs!"
-          	  ${pkgs.cosign}/bin/cosign generate-key-pair
-          	  cat cosign.key | ${pkgs.lib.getExe pkgs.gh} secret set SIGNING_SECRET --app actions
-          	  rm cosign.key
-          	'';
+          echo "DO NOT add any password, this will break your CI jobs!"
+          ${pkgs.cosign}/bin/cosign generate-key-pair
+          cat cosign.key | ${pkgs.lib.getExe pkgs.gh} secret set SIGNING_SECRET --app actions
+          rm cosign.key
+        '';
       });
 
       devShells = forEachSupportedSystem ({ pkgs }: {
         default = pkgs.mkShell {
           inherit (self.checks.${pkgs.system}.pre-commit-check) shellHook;
-          packages = with pkgs; [
-            git
-            jq
-            nixpkgs-fmt
-            nushell
-          ];
+          packages = self.lib.${pkgs.system}.devShellPackages;
         };
       });
     };
