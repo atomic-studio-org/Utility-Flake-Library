@@ -6,7 +6,7 @@
     bluebuild.url = "https://flakehub.com/f/blue-build/cli/0.8.2.tar.gz";
     flake-schemas.url = "https://flakehub.com/f/DeterminateSystems/flake-schemas/*.tar.gz";
     nix-pre-commit-hooks.url = "https://github.com/cachix/pre-commit-hooks.nix/tarball/master";
-    nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/*.tar.gz";
+    nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1.0.tar.gz";
   };
 
   outputs = { self, flake-schemas, nixpkgs, nix-pre-commit-hooks, bluebuild }:
@@ -28,8 +28,10 @@
           bluebuild.packages.${pkgs.system}.bluebuild
           git
           jq
+	  yq
           nixpkgs-fmt
           nushell
+	  gh
         ];
       });
 
@@ -41,10 +43,23 @@
           hooks = {
             nixpkgs-fmt.enable = true;
             shellcheck.enable = true;
-            markdownlint.enable = true;
             yamllint.enable = true;
             commitizen.enable = true;
+            markdownlint.enable = true;
           };
+
+	  settings = {
+	    markdownlint.config = {
+	      "MD013" = {
+		line_length = 280;
+		code_blocks = false;
+		tables = false;
+	      };
+	      "MD033" = {
+		allowed_elements = ["<div>" "<h1>" "<h2>" "<h3>" "<h4>" "<img>"];
+	      };
+	    };
+	  };
         };
       });
 
@@ -57,10 +72,22 @@
       };
 
       packages = forEachSupportedSystem ({ pkgs }: {
-        cosign-generate = pkgs.writeScriptBin "cosign-generate" ''
+        generate-sbkey = pkgs.writers.writeNuBin "sbkey-generator" ''
+	def main [--folder_name (-f): string] {
+	  if $folder_name != null {
+	    mkdir $folder_name
+	  } else {
+	    mkdir result
+	  }
+
+          ${pkgs.lib.getExe pkgs.openssl} req -new -x509 -newkey rsa:2048 -nodes -days 36500 -outform DER -keyout "result/MOK.priv" -out "result/MOK.der"
+	}
+        '';
+
+        cosign-generate = pkgs.writers.writeNuBin "cosign-generate" ''
           echo "DO NOT add any password, this will break your CI jobs!"
           ${pkgs.cosign}/bin/cosign generate-key-pair
-          cat cosign.key | ${pkgs.lib.getExe pkgs.gh} secret set SIGNING_SECRET --app actions
+          open cosign.key | ${pkgs.lib.getExe pkgs.gh} secret set SIGNING_SECRET --app actions
           rm cosign.key
         '';
       });
