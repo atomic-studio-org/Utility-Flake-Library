@@ -28,10 +28,10 @@
           bluebuild.packages.${pkgs.system}.bluebuild
           git
           jq
-	  yq
+          yq
           nixpkgs-fmt
           nushell
-	  gh
+          gh
         ];
       });
 
@@ -48,18 +48,18 @@
             markdownlint.enable = true;
           };
 
-	  settings = {
-	    markdownlint.config = {
-	      "MD013" = {
-		line_length = 280;
-		code_blocks = false;
-		tables = false;
-	      };
-	      "MD033" = {
-		allowed_elements = ["<div>" "<h1>" "<h2>" "<h3>" "<h4>" "<img>"];
-	      };
-	    };
-	  };
+          settings = {
+            markdownlint.config = {
+              "MD013" = {
+                line_length = 280;
+                code_blocks = false;
+                tables = false;
+              };
+              "MD033" = {
+                allowed_elements = [ "<div>" "<h1>" "<h2>" "<h3>" "<h4>" "<img>" ];
+              };
+            };
+          };
         };
       });
 
@@ -73,15 +73,15 @@
 
       packages = forEachSupportedSystem ({ pkgs }: {
         generate-sbkey = pkgs.writers.writeNuBin "sbkey-generator" ''
-	def main [--folder_name (-f): string] {
-	  if $folder_name != null {
-	    mkdir $folder_name
-	  } else {
-	    mkdir result
-	  }
+          	def main [--folder_name (-f): string] {
+          	  if $folder_name != null {
+          	    mkdir $folder_name
+          	  } else {
+          	    mkdir result
+          	  }
 
-          ${pkgs.lib.getExe pkgs.openssl} req -new -x509 -newkey rsa:2048 -nodes -days 36500 -outform DER -keyout "result/MOK.priv" -out "result/MOK.der"
-	}
+                    ${pkgs.lib.getExe pkgs.openssl} req -new -x509 -newkey rsa:2048 -nodes -days 36500 -outform DER -keyout "result/MOK.priv" -out "result/MOK.der"
+          	}
         '';
 
         cosign-generate = pkgs.writers.writeNuBin "cosign-generate" ''
