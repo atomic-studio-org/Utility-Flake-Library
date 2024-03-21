@@ -63,7 +63,7 @@
         };
       });
 
-      template = rec {
+      templates = rec {
         default = github-repository;
         github-repository = {
           path = ./template/github-repository;
@@ -73,15 +73,15 @@
 
       packages = forEachSupportedSystem ({ pkgs }: {
         generate-sbkey = pkgs.writers.writeNuBin "sbkey-generator" ''
-          	def main [--folder_name (-f): string] {
-          	  if $folder_name != null {
-          	    mkdir $folder_name
-          	  } else {
-          	    mkdir result
-          	  }
+          def main [--folder_name (-f): string] {
+            if $folder_name != null {
+              mkdir $folder_name
+            } else {
+              mkdir result
+            }
 
-                    ${pkgs.lib.getExe pkgs.openssl} req -new -x509 -newkey rsa:2048 -nodes -days 36500 -outform DER -keyout "result/MOK.priv" -out "result/MOK.der"
-          	}
+            ${pkgs.lib.getExe pkgs.openssl} req -new -x509 -newkey rsa:2048 -nodes -days 36500 -outform DER -keyout "result/MOK.priv" -out "result/MOK.der"
+          }
         '';
 
         cosign-generate = pkgs.writers.writeNuBin "cosign-generate" ''
