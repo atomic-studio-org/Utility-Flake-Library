@@ -4,7 +4,7 @@
 
   inputs = {
     flake-schemas.url = "https://flakehub.com/f/DeterminateSystems/flake-schemas/*.tar.gz";
-    utility-flake.url = "github:atomic-studio-org/Utility-Flake-Library";
+    utility-flake.url = "https://flakehub.com/f/atomic-studio-org/Utility-Flake-Library/*.tar.gz";
     nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/*.tar.gz";
   };
 
@@ -29,7 +29,7 @@
       });
 
       devShells = forEachSupportedSystem ({ pkgs }: {
-        default = utility-flake.devShells.${pkgs.system};
+        inherit (utility-flake.devShells.${pkgs.system}) default;
       });
     };
 }
