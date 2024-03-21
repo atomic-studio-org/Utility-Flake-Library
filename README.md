@@ -12,7 +12,7 @@ You can consume this repo in your other projects by running the following comman
 
 ```shell
 # This should initialize a github repo with default things
-nix flake init --template https://github.com/atomic-studio-org/Utility-Flake-Library.git#
+nix flake init --template github:atomic-studio-org/Utility-Flake-Library#
 ```
 
 Any other attibute is specified in the nix flake and it can be imported
