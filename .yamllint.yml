@@ -1,0 +1,14 @@
+---
+yaml-files:
+  - '*.yaml'
+  - '*.yml'
+  - '.yamllint'
+
+ignore: |
+  .github/workflows/
+  **/.github/workflows/
+
+rules:
+  line-length:
+    max: 160
+    level: warning

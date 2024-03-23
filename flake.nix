@@ -44,22 +44,28 @@
           hooks = {
             nixpkgs-fmt.enable = true;
             shellcheck.enable = true;
-            yamllint.enable = true;
-            commitizen.enable = true;
-            markdownlint.enable = true;
-          };
-          settings = {
-            markdownlint.config = {
-              "MD013" = {
-                line_length = 280;
-                code_blocks = false;
-                tables = false;
+            yamllint = {
+              enable = true;
+              settings = {
+                configPath = "${./.yamllint.yml}";
               };
-              "MD033" = {
-                allowed_elements = [ "<div>" "<h1>" "<h2>" "<h3>" "<h4>" "<img>" ];
+            };
+            commitizen.enable = true;
+            markdownlint = {
+              enable = true;
+              settings.config = {
+                "MD013" = {
+                  line_length = 280;
+                  code_blocks = false;
+                  tables = false;
+                };
+                "MD033" = {
+                  allowed_elements = [ "<div>" "<h1>" "<h2>" "<h3>" "<h4>" "<img>" ];
+                };
               };
             };
           };
+
         };
       });
 
@@ -73,28 +79,28 @@
 
       packages = forEachSupportedSystem ({ pkgs }: {
         generate-sbkey = pkgs.writers.writeNuBin "sbkey-generator" ''
-          	  # Generate secure boot keys for any kernel signing effort you need
-                    def main [--folder_name (-f): string] {
-                      if $folder_name != null {
-                        mkdir $folder_name
-                      } else {
-                        mkdir result
-                      }
+          # Generate secure boot keys for any kernel signing effort you need
+          def main [--folder_name (-f): string] {
+            if $folder_name != null {
+              mkdir $folder_name
+            } else {
+              mkdir result
+            }
 
-                      ${pkgs.lib.getExe pkgs.openssl} req -new -x509 -newkey rsa:2048 -nodes -days 36500 -outform DER -keyout "result/MOK.priv" -out "result/MOK.der"
-                    }
+            ${pkgs.lib.getExe pkgs.openssl} req -new -x509 -newkey rsa:2048 -nodes -days 36500 -outform DER -keyout "result/MOK.priv" -out "result/MOK.der"
+          }
         '';
 
         cosign-generate = pkgs.writers.writeNuBin "cosign-generate" ''
-          	  # Generate a private and public cosign key for container signing usage!
-          	  def main [--keep] {
-          	    echo "DO NOT add any password, this will break your CI jobs!"
-                      ${pkgs.cosign}/bin/cosign generate-key-pair
-                      open cosign.key | ${pkgs.lib.getExe pkgs.gh} secret set SIGNING_SECRET --app actions
-          	    if $keep == null {
-          	    rm cosign.key
-          	    }
-          	  }
+          # Generate a private and public cosign key for container signing usage!
+          def main [--keep] {
+            echo "DO NOT add any password, this will break your CI jobs!"
+              ${pkgs.cosign}/bin/cosign generate-key-pair
+              open cosign.key | ${pkgs.lib.getExe pkgs.gh} secret set SIGNING_SECRET --app actions
+            if $keep == null {
+            rm cosign.key
+            }
+          }
         '';
       });
 
