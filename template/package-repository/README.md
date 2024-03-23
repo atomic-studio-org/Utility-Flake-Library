@@ -1,5 +1,7 @@
+#
+
 <div align="center">
-    <img src="./assets/sample.png" alt="sample logo" width="200rem"/> 
+    <img src="./assets/sample.png" alt="sample logo" width="200rem"/>
     <h1 style="font-size: 48px; margin-left: 0.1em; text-align: center;">Sample</h1>
 </div>
 

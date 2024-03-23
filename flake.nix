@@ -60,12 +60,11 @@
                   tables = false;
                 };
                 "MD033" = {
-                  allowed_elements = [ "<div>" "<h1>" "<h2>" "<h3>" "<h4>" "<img>" ];
+                  allowed_elements = [ "div" "h1" "h2" "h3" "h4" "img" ];
                 };
               };
             };
           };
-
         };
       });
 
