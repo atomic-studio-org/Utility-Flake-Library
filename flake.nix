@@ -60,7 +60,7 @@
                   tables = false;
                 };
                 "MD033" = {
-                  allowed_elements = [ "div" "h1" "h2" "h3" "h4" "img" ];
+                  allowed_elements = [ "div" "h1" "h2" "h3" "h4" "img" "a" "p" "br" "hr" "strong" ];
                 };
               };
             };
@@ -73,6 +73,10 @@
         github-repository = {
           path = ./template/github-repository;
           description = "Github repository template for any Atomic Studio project";
+        };
+        package-repository = {
+          path = ./template/package-repository;
+          description = "Github repository template for any Atomic Studio project that needs packaging";
         };
       };
 
