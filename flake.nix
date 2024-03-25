@@ -41,7 +41,6 @@
         pre-commit-check = nix-pre-commit-hooks.lib.${pkgs.system}.run {
           src = ./.;
 
-          default_stages = [ "manual" "push" ];
           hooks = {
             nixpkgs-fmt.enable = true;
             shellcheck.enable = true;
