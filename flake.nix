@@ -32,6 +32,7 @@
           nixpkgs-fmt
           nushell
           gh
+          jujutsu
         ];
       });
 
@@ -109,7 +110,6 @@
 
       devShells = forEachSupportedSystem ({ pkgs }: {
         default = pkgs.mkShell {
-          inherit (self.checks.${pkgs.system}.pre-commit-check) shellHook;
           packages = self.lib.${pkgs.system}.devShellPackages;
         };
       });
