@@ -33,6 +33,9 @@
           nushell
           gh
           jujutsu
+          (writeScriptBin "gh-jj" ''
+            GIT_DIR=.jj/repo/store/git ${lib.getExe pkgs.gh} $@ 
+          '')
         ];
       });
 
