@@ -47,7 +47,7 @@
             yamllint = {
               enable = true;
               settings = {
-                configPath = "${./.yamllint.yml}";
+                configPath = "${./yamllint.yml}";
               };
             };
             commitizen.enable = true;
@@ -98,10 +98,10 @@
           # Generate a private and public cosign key for container signing usage!
           def main [--keep] {
             echo "DO NOT add any password, this will break your CI jobs!"
-              ${pkgs.cosign}/bin/cosign generate-key-pair
-              open cosign.key | ${pkgs.lib.getExe pkgs.gh} secret set SIGNING_SECRET --app actions
+            ${pkgs.cosign}/bin/cosign generate-key-pair
+            open cosign.key | ${pkgs.lib.getExe pkgs.gh} secret set SIGNING_SECRET --app actions
             if $keep == null {
-            rm cosign.key
+              rm cosign.key
             }
           }
         '';
